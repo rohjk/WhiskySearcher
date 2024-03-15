@@ -1,0 +1,28 @@
+*.iml
+.gradle
+**/build/
+xcuserdata
+!src/**/build/
+local.properties
+.idea
+.DS_Store
+captures
+.externalNativeBuild
+.cxx
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+!*.xcodeproj/project.xcworkspace/
+!*.xcworkspace/contents.xcworkspacedata
+**/xcshareddata/WorkspaceSettings.xcsettings
+
+prebuilds/fullsdk-linux
+prebuilds/fullsdk-darwin
+out
+/local.properties
+.idea/
+build/
+/captures
+
+# Ignoring the persistant lockfile until kotlin.js vulnerabilities are fixed
+# yarn.lock # but absent yarn.lock leads to inconsistent builds on CI, so let's keep it
