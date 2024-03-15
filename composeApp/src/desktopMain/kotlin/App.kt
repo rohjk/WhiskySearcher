@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -25,10 +26,12 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -52,21 +55,30 @@ fun App() {
         var showLoading by remember { mutableStateOf(false) }
         var searchKeyword by remember { mutableStateOf("") }
         var searchedWhisky by remember { mutableStateOf(listOf<Whisky>()) }
+        val checkedWhiskyMap: SnapshotStateMap<Long,Whisky> = remember { mutableStateMapOf() }
 
         var selectedIndex by remember { mutableStateOf(-1) }
+
+        val searchResultScrollState = rememberLazyListState()
+        val checkedWhiskyScrollState = rememberLazyListState()
 
         fun search(keyword: String) {
             showLoading = true
             scope.launch {
+                selectedIndex = -1
+                searchResultScrollState.scrollToItem(0)
+
                 val result = searchRepository.search(keyword)
                 searchedWhisky = result
                 showLoading = false
             }
         }
 
-        val scrollState = rememberLazyListState()
-
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
+        Column(
+            Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.Start
+        ) {
             Row(
                 modifier = Modifier.widthIn(max = 500.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -90,17 +102,17 @@ fun App() {
                 }
             }
             Divider(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
+                modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
                 thickness = 1.dp,
                 color = Color.DarkGray
             )
 
             Row(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.weight(1f).fillMaxWidth()
             ) {
                 LazyColumn(
                     modifier = Modifier.weight(1f),
-                    state = scrollState
+                    state = searchResultScrollState
                 ) {
                     itemsIndexed(
                         items = searchedWhisky,
@@ -120,12 +132,19 @@ fun App() {
 
                     val selectedItem = searchedWhisky[selectedIndex]
 
+                    var koName by remember(selectedItem) { mutableStateOf(selectedItem.koName) }
+                    var enName by remember(selectedItem) { mutableStateOf(selectedItem.enName) }
+                    var country by remember(selectedItem) { mutableStateOf(selectedItem.country) }
+                    var category by remember(selectedItem) { mutableStateOf(selectedItem.category) }
+                    var abv by remember(selectedItem) { mutableStateOf(selectedItem.abv) }
+
                     Column(
                         modifier = Modifier.width(500.dp).fillMaxHeight().verticalScroll(
                             rememberScrollState()
                         ),
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
+                        val modifier = Modifier.fillMaxWidth()
                         val painter = rememberImagePainter(selectedItem.imageUrl)
                         Box(modifier = Modifier.fillMaxWidth()) {
                             Image(
@@ -134,15 +153,64 @@ fun App() {
                                 contentDescription = ""
                             )
                         }
-                        Text(text = selectedItem.koName)
-                        Text(text = selectedItem.enName)
-                        Text(text = selectedItem.country)
-                        Text(text = selectedItem.category)
-                        Text(text = selectedItem.abv)
+                        TextField(
+                            modifier = modifier,
+                            value = koName,
+                            onValueChange = { koName = it })
+                        TextField(
+                            modifier = modifier,
+                            value = enName,
+                            onValueChange = { enName = it })
+                        TextField(
+                            modifier = modifier,
+                            value = country,
+                            onValueChange = { country = it })
+                        TextField(
+                            modifier = modifier,
+                            value = category,
+                            onValueChange = { category = it })
+                        TextField(modifier = modifier, value = abv, onValueChange = { abv = it })
+
+                        Button(
+                            modifier = modifier,
+                            onClick = {
+                                checkedWhiskyMap[selectedItem.id] = selectedItem.copy(
+                                    koName = koName,
+                                    enName = enName,
+                                    country = country,
+                                    category = category,
+                                    abv = abv
+                                )
+                            }
+                        ) {
+                            Text("저장")
+                        }
                     }
                 }
 
             }
+
+            Divider(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
+                thickness = 1.dp,
+                color = Color.DarkGray
+            )
+
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp, max = 100.dp),
+                state = checkedWhiskyScrollState,
+            ) {
+                itemsIndexed(
+                    items = checkedWhiskyMap.values.toList(),
+                    key = { index: Int, item: Whisky -> "${index}_${item.id}" }
+                ) { index, item ->
+                    Text(
+                        text = "$index. " + item.toString(),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+
         }
     }
 }

@@ -8,4 +8,7 @@ data class Whisky(
     val category: String,
     val abv: String,
     val imageUrl: String,
-)
+) {
+    override fun toString(): String = listOf(id, koName, enName, country, category, abv).joinToString(separator = " | ")
+
+}
