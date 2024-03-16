@@ -1,4 +1,3 @@
-import androidx.compose.runtime.key
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +15,7 @@ class SearchRepository {
     val gson = Gson()
 
     suspend fun search(keyword: String): List<Whisky> = withContext(Dispatchers.IO) {
-        val url = URL("https://api.dailyshot.co/items/search/?q=${keyword}&page=1&page_size=100")
+        val url = URL("https://api.dailyshot.co/items/search/?q=${keyword}&page=1&page_size=1000")
         val connection = url.openConnection() as HttpURLConnection
 
         val streamReader = InputStreamReader(connection.inputStream)
