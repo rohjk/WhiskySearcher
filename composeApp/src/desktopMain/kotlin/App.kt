@@ -56,6 +56,8 @@ fun App() {
     MaterialTheme {
         val searchRepository = remember { SearchRepository() }
         val csvGenerator = remember { CsvGenerator() }
+        val imageDownloader = remember { ImageDownloader() }
+
         val scope = rememberCoroutineScope()
 
         var showLoading by remember { mutableStateOf(false) }
@@ -87,7 +89,11 @@ fun App() {
         }
 
         fun exportImage() {
-
+            showLoading = true
+            scope.launch {
+                imageDownloader.downloadImages(checkedWhiskyMap.values.toList())
+                showLoading = false
+            }
         }
 
         Column(
