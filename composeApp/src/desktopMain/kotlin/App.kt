@@ -260,7 +260,7 @@ fun App() {
                 state = checkedWhiskyScrollState,
             ) {
                 itemsIndexed(
-                    items = checkedWhiskyMap.values.toList(),
+                    items = checkedWhiskyMap.values.toList().sortedBy { it.koName },
                     key = { index: Int, item: Whisky -> "${index}_${item.id}" }
                 ) { index, item ->
                     Row(

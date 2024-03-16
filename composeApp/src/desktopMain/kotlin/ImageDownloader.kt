@@ -28,7 +28,6 @@ class ImageDownloader {
         val fileName = "${id}.webp"
         val url = URL(imageUrl)
         url.openStream().use { Files.copy(it, Paths.get("origin/$fileName")) }
-        println("download done")
     }
 
     private fun removeBackGround() {

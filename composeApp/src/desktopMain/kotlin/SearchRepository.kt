@@ -28,7 +28,7 @@ class SearchRepository {
 
         val entities = gson.fromJson(content, ResponseDto::class.java).result
 
-        entities.map { async { it.toWhisky() } }.awaitAll().filterNotNull()
+        entities.sortedBy { it.name }.map { async { it.toWhisky() } }.awaitAll().filterNotNull()
     }
 
     private fun WhiskyEntity.toWhisky(): Whisky? {
