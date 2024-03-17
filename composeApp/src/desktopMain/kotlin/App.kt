@@ -44,6 +44,7 @@ import org.jetbrains.compose.resources.stringResource
 import whiskikiwhiskysearcher.composeapp.generated.resources.Res
 import whiskikiwhiskysearcher.composeapp.generated.resources.csv_export
 import whiskikiwhiskysearcher.composeapp.generated.resources.delete
+import whiskikiwhiskysearcher.composeapp.generated.resources.fetch_all_sort_by_newest
 import whiskikiwhiskysearcher.composeapp.generated.resources.image_export
 import whiskikiwhiskysearcher.composeapp.generated.resources.save
 import whiskikiwhiskysearcher.composeapp.generated.resources.search
@@ -71,6 +72,18 @@ fun App() {
 
         val searchResultScrollState = rememberLazyListState()
         val checkedWhiskyScrollState = rememberLazyListState()
+
+        fun fetchAll() {
+            showLoading = true
+            scope.launch {
+                selectedIndex = -1
+                searchResultScrollState.scrollToItem(0)
+
+                val result = searchRepository.fetchAll()
+                searchedWhiskys = result
+                showLoading = false
+            }
+        }
 
         fun search(keyword: String) {
             showLoading = true
@@ -111,6 +124,14 @@ fun App() {
                         CircularProgressIndicator(modifier = Modifier.fillMaxSize())
                     }
                 }
+
+                Button(
+                    modifier = Modifier.padding(horizontal = 5.dp),
+                    onClick = { fetchAll() }
+                ) {
+                    Text(text = stringResource(Res.string.fetch_all_sort_by_newest))
+                }
+
                 TextField(
                     modifier = Modifier.weight(1f),
                     value = searchKeyword,

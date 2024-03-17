@@ -14,8 +14,17 @@ import java.net.URL
 class SearchRepository {
     val gson = Gson()
 
-    suspend fun search(keyword: String): List<Whisky> = withContext(Dispatchers.IO) {
-        val url = URL("https://api.dailyshot.co/items/search/?q=${keyword}&page=1&page_size=1000")
+    suspend fun fetchAll(): List<Whisky> {
+        val url = "https://api.dailyshot.co/items/?page=1&page_size=1000&ordering=-id&category_id=22"
+        return fetch(url)
+    }
+    suspend fun search(keyword: String): List<Whisky> {
+        val url = "https://api.dailyshot.co/items/search/?q=${keyword}&page=1&page_size=1000"
+        return fetch(url).sortedBy { it.koName }
+    }
+
+    private suspend fun fetch(fetchUrl: String): List<Whisky> = withContext(Dispatchers.IO) {
+        val url = URL(fetchUrl)
         val connection = url.openConnection() as HttpURLConnection
 
         val streamReader = InputStreamReader(connection.inputStream)
@@ -28,7 +37,7 @@ class SearchRepository {
 
         val entities = gson.fromJson(content, ResponseDto::class.java).result
 
-        entities.sortedBy { it.name }.map { async { it.toWhisky() } }.awaitAll().filterNotNull()
+        entities.map { async { it.toWhisky() } }.awaitAll().filterNotNull()
     }
 
     private fun WhiskyEntity.toWhisky(): Whisky? {
