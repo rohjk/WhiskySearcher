@@ -10,7 +10,15 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 class ImageDownloader {
-    suspend fun downloadImages(whiskies: List<Whisky>): Boolean = withContext(Dispatchers.IO) {
+
+    private val defaultPath = System.getProperty("user.home") + "/Desktop"
+    private val brewPath = "/opt/homebrew/bin"
+
+    private val originDirPath = defaultPath + "/" + DIR_ORIGIN
+    private val removeBgDirPath = defaultPath + "/" + DIR_REMOVE_GB
+    private val imagesDirPath = defaultPath + "/" + DIR_IMAGES
+
+    suspend fun downloadImages(whiskies: List<Whisky>): String = withContext(Dispatchers.IO) {
         try {
             initDirectories()
             whiskies.map {
@@ -19,15 +27,15 @@ class ImageDownloader {
             removeBackGround()
             convertWebp()
             cleanDirectories()
-            true
+            "완료"
         } catch (e: Exception) {
             println("download Error : $e")
-            false
+            e.toString()
         }
     }
 
     private fun initDirectories() {
-        listOf(DIR_ORIGIN, DIR_REMOVE_GB, DIR_IMAGES)
+        listOf(originDirPath, removeBgDirPath, imagesDirPath)
             .forEach {
                 File(it).apply {
                     deleteRecursively()
@@ -37,7 +45,7 @@ class ImageDownloader {
     }
 
     private fun cleanDirectories() {
-        listOf(DIR_ORIGIN, DIR_REMOVE_GB)
+        listOf(originDirPath, removeBgDirPath)
             .forEach {
                 File(it).deleteRecursively()
             }
@@ -46,21 +54,21 @@ class ImageDownloader {
     private fun downloadOriginImage(id: Long, imageUrl: String) {
         val fileName = "${id}.webp"
         val url = URL(imageUrl)
-        url.openStream().use { Files.copy(it, Paths.get("$DIR_ORIGIN/$fileName")) }
+        url.openStream().use { Files.copy(it, Paths.get("$originDirPath/$fileName")) }
     }
 
     private fun removeBackGround() {
-        val process = ProcessBuilder().command("rembg", "p", DIR_ORIGIN, DIR_REMOVE_GB).start()
+        val process = ProcessBuilder().command("$brewPath/rembg", "p", originDirPath, removeBgDirPath).start()
         process.waitFor()
     }
 
     private suspend fun convertWebp() {
         coroutineScope {
-            File(DIR_REMOVE_GB).listFiles()?.map { file ->
+            File(removeBgDirPath).listFiles()?.map { file ->
                 async {
                     convertWebp(
                         source = file.absolutePath,
-                        output = "$DIR_IMAGES/${file.nameWithoutExtension}.webp"
+                        output = "$imagesDirPath/${file.nameWithoutExtension}.webp"
                     )
                 }
             }?.awaitAll()
@@ -68,7 +76,7 @@ class ImageDownloader {
     }
 
     private fun convertWebp(source: String, output: String) {
-        val process = ProcessBuilder().command("cwebp",source,"-o",output).start()
+        val process = ProcessBuilder().command("$brewPath/cwebp",source,"-o",output).start()
         process.waitFor()
     }
 

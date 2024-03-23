@@ -64,6 +64,7 @@ fun App() {
         var showLoading by remember { mutableStateOf(false) }
         var searchKeyword by remember { mutableStateOf("") }
         var storageDir by remember { mutableStateOf(getCurrentDate()) }
+        var currentProcessStatus by remember { mutableStateOf("") }
 
         var searchedWhiskys by remember { mutableStateOf(listOf<Whisky>()) }
         val checkedWhiskyMap: SnapshotStateMap<Long, Whisky> = remember { mutableStateMapOf() }
@@ -104,7 +105,7 @@ fun App() {
         fun exportImage() {
             showLoading = true
             scope.launch {
-                imageDownloader.downloadImages(checkedWhiskyMap.values.toList())
+                currentProcessStatus = imageDownloader.downloadImages(checkedWhiskyMap.values.toList())
                 showLoading = false
             }
         }
@@ -314,7 +315,7 @@ fun App() {
                     }
                 }
             }
-
+            Text(modifier = Modifier.fillMaxWidth(), text = currentProcessStatus)
         }
     }
 }
