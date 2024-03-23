@@ -1,4 +1,5 @@
 import model.Whisky
+import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
 import java.nio.charset.StandardCharsets
@@ -8,8 +9,11 @@ class CsvGenerator {
         private const val SUPABASE_ID = "ghsleideklxvllufjyhc"
     }
 
+    private val defaultPath = System.getProperty("user.home") + "/Desktop"
+
     fun export(whiskies: List<Whisky>, storeDir: String) {
-        FileOutputStream("export_whisky_${getCurrentDate()}.csv").writeCsv(whiskies, storeDir)
+        val file = File(defaultPath,"export_whisky_${getCurrentDate()}.csv")
+        FileOutputStream(file).writeCsv(whiskies, storeDir)
     }
 
     private fun OutputStream.writeCsv(whiskies: List<Whisky>, storeDir: String) {

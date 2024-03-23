@@ -38,10 +38,28 @@ compose.desktop {
     application {
         mainClass = "MainKt"
 
+        javaHome = "/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home"
+
         nativeDistributions {
+            includeAllModules = true
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.whiskiki.whisky.searcher"
+            packageName = "WhiskikiWhiskySearcher"
             packageVersion = "1.0.0"
+            macOS {
+                // a version for all macOS distributables
+                packageVersion = "1.0.0"
+                // a version only for the dmg package
+                dmgPackageVersion = "1.0.0"
+                // a version only for the pkg package
+                pkgPackageVersion = "1.0.0"
+
+                // a build version for all macOS distributables
+                packageBuildVersion = "1.0.0"
+                // a build version only for the dmg package
+                dmgPackageBuildVersion = "1.0.0"
+                // a build version only for the pkg package
+                pkgPackageBuildVersion = "1.0.0"
+            }
         }
     }
 }
