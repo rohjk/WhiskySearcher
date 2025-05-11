@@ -92,7 +92,7 @@ fun App() {
                 selectedIndex = -1
                 searchResultScrollState.scrollToItem(0)
 
-                val result = searchRepository.search(keyword)
+                val result = runCatching { searchRepository.search(keyword) }.getOrElse { emptyList() }
                 searchedWhiskys = result
                 showLoading = false
             }

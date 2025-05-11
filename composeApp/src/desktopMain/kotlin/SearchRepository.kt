@@ -19,7 +19,7 @@ class SearchRepository {
         return fetch(url)
     }
     suspend fun search(keyword: String): List<Whisky> {
-        val url = "https://api.dailyshot.co/items/search/?q=${keyword}&page=1&page_size=1000"
+        val url = "https://api.dailyshot.co/items/search/?q=${keyword.replace(" ", "%20")}&page=1&page_size=1000"
         return fetch(url).sortedBy { it.koName }
     }
 

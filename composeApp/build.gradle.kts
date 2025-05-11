@@ -6,6 +6,7 @@ plugins {
 }
 
 kotlin {
+    jvmToolchain(17)
     jvm("desktop")
     
     sourceSets {
@@ -44,21 +45,21 @@ compose.desktop {
             includeAllModules = true
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "WhiskikiWhiskySearcher"
-            packageVersion = "1.0.0"
+            packageVersion = "1.1.0"
             macOS {
                 // a version for all macOS distributables
-                packageVersion = "1.0.0"
+                packageVersion = "1.1.0"
                 // a version only for the dmg package
-                dmgPackageVersion = "1.0.0"
+                dmgPackageVersion = "1.1.0"
                 // a version only for the pkg package
-                pkgPackageVersion = "1.0.0"
+                pkgPackageVersion = "1.1.0"
 
                 // a build version for all macOS distributables
-                packageBuildVersion = "1.0.0"
+                packageBuildVersion = "1.1.0"
                 // a build version only for the dmg package
-                dmgPackageBuildVersion = "1.0.0"
+                dmgPackageBuildVersion = "1.1.0"
                 // a build version only for the pkg package
-                pkgPackageBuildVersion = "1.0.0"
+                pkgPackageBuildVersion = "1.1.0"
             }
         }
     }
