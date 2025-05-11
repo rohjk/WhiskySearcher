@@ -20,7 +20,7 @@ class SearchRepository {
     }
     suspend fun search(keyword: String): List<Whisky> {
         val url = "https://api.dailyshot.co/items/search/?q=${keyword.replace(" ", "%20")}&page=1&page_size=1000"
-        return fetch(url).sortedBy { it.koName }
+        return fetch(url)
     }
 
     private suspend fun fetch(fetchUrl: String): List<Whisky> = withContext(Dispatchers.IO) {
